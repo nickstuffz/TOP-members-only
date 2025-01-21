@@ -1,6 +1,4 @@
 todo:
 
-use db store psql connect for session
-use cookie age
 get flash working
 validate input

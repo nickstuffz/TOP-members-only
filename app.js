@@ -4,10 +4,11 @@ const express = require("express");
 const asyncHandler = require("express-async-handler");
 const { engine } = require("express-handlebars");
 const session = require("express-session");
+const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const bcrypt = require("bcryptjs");
 const pgSession = require("connect-pg-simple")(session);
+const flash = require("connect-flash");
 const pool = require("./db/pool");
 
 // Passport Config
@@ -69,6 +70,7 @@ app.use(
   })
 );
 app.use(passport.session());
+app.use(flash());
 
 // Routes
 app.get("/", (req, res) => {
@@ -76,13 +78,17 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render("login");
+  console.log(req.flash);
+
+  const errorMessage = req.flash("error"); // Retrieve the error message
+  res.render("login", { error: errorMessage });
 });
 app.post(
   "/login",
   passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/login",
+    failureFlash: true,
   })
 );
 
