@@ -1,0 +1,6 @@
+todo:
+
+use db store psql connect for session
+use cookie age
+set session ttl
+get flash working

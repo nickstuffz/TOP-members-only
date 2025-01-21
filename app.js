@@ -23,9 +23,7 @@ passport.use(
         return done(null, false, { message: "username not found" });
       }
 
-      // BUG why getting await is unnecessary here
       const match = await bcrypt.compare(password, user.password);
-      console.log(match);
 
       if (!match) {
         return done(null, false, { message: "incorrect password" });
