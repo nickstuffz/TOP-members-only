@@ -1,13 +1,14 @@
 // Dependencies
 require("dotenv").config();
 const express = require("express");
-const session = require("express-session");
-const pool = require("./db/pool");
-const passport = require("passport");
-const { engine } = require("express-handlebars");
-const bcrypt = require("bcryptjs");
-const LocalStrategy = require("passport-local").Strategy;
 const asyncHandler = require("express-async-handler");
+const { engine } = require("express-handlebars");
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require("bcryptjs");
+const pgSession = require("connect-pg-simple")(session);
+const pool = require("./db/pool");
 
 // Passport Config
 passport.use(
@@ -49,7 +50,7 @@ passport.deserializeUser(
   })
 );
 
-// Express Setup
+// Setup
 const app = express();
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
@@ -58,16 +59,19 @@ app.set("views", "./views");
 app.use(express.urlencoded({ extended: false }));
 app.use(
   session({
+    store: new pgSession({
+      pool: pool,
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 1 day
   })
 );
 app.use(passport.session());
 
 // Routes
 app.get("/", (req, res) => {
-  console.log(req.user);
   res.render("index", { user: req.user });
 });
 

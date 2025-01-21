@@ -5,8 +5,7 @@ require("dotenv").config();
 const { Client } = require("pg");
 
 const SQL = `
-DROP TABLE IF EXISTS users;
-
+-- create users table
 CREATE TABLE users (
    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
    username VARCHAR ( 255 ) NOT NULL,
@@ -14,6 +13,20 @@ CREATE TABLE users (
 );
 
 CREATE UNIQUE INDEX username_lower_idx ON users (LOWER(username));
+
+
+-- create session table (default from connect-pg-simple)
+CREATE TABLE "session" (
+  "sid" varchar NOT NULL COLLATE "default",
+  "sess" json NOT NULL,
+  "expire" timestamp(6) NOT NULL
+)
+WITH (OIDS=FALSE);
+
+ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+
+CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+
 `;
 
 async function main() {
