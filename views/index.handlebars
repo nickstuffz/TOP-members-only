@@ -1,11 +1,16 @@
 <h1>
-  home Page
+  home
 </h1>
-<h2>please log in</h2>
-<form action="/login" method="POST">
-  <label for="username">Username</label>
-  <input id="username" name="username" placeholder="username" type="text" />
-  <label for="password">Password</label>
-  <input id="password" name="password" type="password" />
-  <button>Log In</button>
-</form>
+<a href="/login">login</a>
+<a href="/signup">signup</a>
+<a href="/logout">logout</a>
+
+{{#if user}}
+  <h3>
+    Welcome
+    {{user.username}}, you are logged in!
+  </h3>
+{{/if}}
+{{#unless user}}
+  <h3>please log in</h3>
+{{/unless}}
