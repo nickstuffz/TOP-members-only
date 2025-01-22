@@ -56,7 +56,6 @@ const app = express();
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", "./views");
-
 app.use(express.urlencoded({ extended: false }));
 app.use(
   session({
@@ -64,9 +63,10 @@ app.use(
       pool: pool,
     }),
     secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 1 day
+    resave: true,
+    saveUninitialized: false,
+    rolling: true,
+    cookie: { maxAge: 24 * 60 * 60 * 1000, rolling: true }, // 1 day
   })
 );
 app.use(passport.session());
@@ -78,11 +78,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  console.log(req.flash);
-
-  const errorMessage = req.flash("error"); // Retrieve the error message
+  const errorMessage = req.session.flash ? req.flash("error") : null; // Retrieve the error message only if there are messages
   res.render("login", { error: errorMessage });
 });
+
 app.post(
   "/login",
   passport.authenticate("local", {
@@ -95,9 +94,18 @@ app.post(
 app.get("/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) {
-      return next(err);
+      return next(err); // Handle any error during logout
     }
-    res.redirect("/");
+
+    // After logout, destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        return next(err); // Handle any error during session destruction
+      }
+
+      // Redirect the user after logout and session destruction
+      res.redirect("/"); // Redirect to homepage or login page
+    });
   });
 });
 

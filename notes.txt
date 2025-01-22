@@ -1,4 +1,5 @@
 todo:
 
-get flash working
+ßfigure out how to clear session
+-req.session.destroy
 validate input

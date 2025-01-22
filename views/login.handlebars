@@ -7,4 +7,6 @@
   <input id="password" name="password" type="password" />
   <button>Log In</button>
 </form>
-<p>{{error}}</p>
+{{#if error}}
+  <p>{{error}}</p>
+{{/if}}
